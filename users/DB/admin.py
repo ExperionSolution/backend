@@ -4,6 +4,7 @@ from .models import Users
 
 ##########################################################################
 
+
 class UsersAdmin(UserAdmin):
     list_display = (
         "username",
@@ -12,10 +13,18 @@ class UsersAdmin(UserAdmin):
         "id",
         "dni",
         "phone_number",
+        "country"
+    )
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Información Personal', {'fields': ('first_name', 'last_name', 'dni', 'email',
+         'country', 'city', 'address', 'number_address', 'phone_number', 'image_user')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
     )
 
     list_per_page = 25
-    exclude = ("user_update", "date_update", "usuario",)
+
 
 ##########################################################################
 
