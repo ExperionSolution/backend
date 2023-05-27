@@ -1,8 +1,7 @@
 const ProductService = require('../services/products.service');
+const service = new ProductService();
 const { handleHttp, handleNotFound } = require('../utils/error.handler');
 const { handleCreate, handleSuccess, handleNotContent } = require('../utils/success.handler');
-
-const service = new ProductService();
 
 const create = async (req, res) => {
     try{
@@ -11,6 +10,7 @@ const create = async (req, res) => {
     } catch(err){
         handleHttp(res, 'ERROR_CREATE_PRODUCT', err);
     }
+
 }
 
 const get = async (req, res) => {

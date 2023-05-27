@@ -1,18 +1,17 @@
-const {Sequelize} = require('sequelize');
-const { config } = require('../config/config');
-const  setupModels  = require('../db/models');
+const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(
-    config.dbName,
-    config.dbUser,
-    config.dbPassword,
-    {
-        host: config.dbHost,
-        dialect: 'postgresql',
-    }
-);
+const { config } = require('./../config/config');
+const setupModels = require('./../db/models');
 
-sequelize.sync();
+const USER = encodeURIComponent(config.dbUser);
+const PASSWORD = encodeURIComponent(config.dbPassword);
+const URI = `postgres://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/${config.dbName}`;
+
+const sequelize = new Sequelize(URI, {
+  dialect: 'postgres',
+  logging: true,
+});
+
 setupModels(sequelize);
 
 module.exports = sequelize;
