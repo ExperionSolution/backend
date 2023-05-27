@@ -1,4 +1,5 @@
 const { models } = require('../libs/sequelize');
+const { UniqueConstraintError } = require('sequelize/lib/errors');
 
 class StorageService {
     constructor() {
@@ -16,8 +17,20 @@ class StorageService {
     }
 
     async create(data) {
+        const existingStorage = await this.model.findOne({
+          where: { name: data.name },
+        });
+    
+        if (existingStorage) {
+          throw new UniqueConstraintError({
+            message: 'This Storage Already exist.',
+            errors: [{ path: 'name', value: data.name }],
+            fields: ['name'],
+          });
+        }
+    
         return await this.model.create(data);
-    }
+      }
 
     async update(id, data) {
         const storage = await this.getById(id);

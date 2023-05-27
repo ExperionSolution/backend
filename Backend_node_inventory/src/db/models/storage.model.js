@@ -11,11 +11,28 @@ const StorageSchema = {
     name:{
         allowNull:false,
         type:DataTypes.STRING,
+        unique : true,
     },
     address:{
         allowNull:false,
         type:DataTypes.STRING,
-    }
+    },
+    city:{
+        allowNull:false,
+        type:DataTypes.STRING,
+    },
+    phone:{
+        allowNull:false,
+        type:DataTypes.STRING,
+    },
+    email:{
+        allowNull:false,
+        type:DataTypes.STRING,
+    },
+    number_of_employees:{
+        allowNull:false,
+        type:DataTypes.INTEGER,
+    },
    
 };
 
@@ -26,7 +43,7 @@ class Storage extends Model{
             as: 'products',
         });
         
-    } 
+    }
 
     static config(sequelize){
         return {
