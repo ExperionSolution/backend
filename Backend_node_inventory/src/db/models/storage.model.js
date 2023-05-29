@@ -6,24 +6,37 @@ const StorageSchema = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        unique: true,
         type: DataTypes.INTEGER,
     },
     name:{
         allowNull:false,
         type:DataTypes.STRING,
         unique : true,
+        validate: {
+            len: [1, 25]
+        }
     },
     address:{
         allowNull:false,
         type:DataTypes.STRING,
+        validate: {
+            len: [1, 25]
+        }
     },
     city:{
         allowNull:false,
         type:DataTypes.STRING,
+        validate: {
+            len: [1, 25]
+        }
     },
     phone:{
         allowNull:false,
         type:DataTypes.STRING,
+        validate: {
+            len: [12, 20]
+        }
     },
     email:{
         allowNull:false,
