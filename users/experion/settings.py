@@ -46,7 +46,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-
+                BASE_DIR / 'templates'
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -112,16 +112,28 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 AUTH_USER_MODEL = 'DB.Users'
 
+LOGIN_REDIRECT_URL = 'index'
+
+
+#---------------Send Mail-----------------------------------------#
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_USE_TLS=True
+EMAIL_PORT=587
+EMAIL_HOST_USER="experiontest2023@gmail.com"
+EMAIL_HOST_PASSWORD="lgksvypjjmelvuys"
 
 
 #---------------BD Desarrollo-----------------------------------------#
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 
+
+
+ALLOWED_HOSTS = ['localhost']
 
 DATABASES = {
     'default': {
@@ -133,3 +145,5 @@ DATABASES = {
         'PORT': 5432,
     }
 }
+
+
