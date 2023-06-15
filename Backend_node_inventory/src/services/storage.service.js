@@ -21,13 +21,7 @@ class StorageService {
           where: { name: data.name },
         });
     
-        if (existingStorage) {
-          throw new UniqueConstraintError({
-            message: 'This Storage Already exist.',
-            errors: [{ path: 'name', value: data.name }],
-            fields: ['name'],
-          });
-        }
+        if (existingStorage) return false;
     
         return await this.model.create(data);
       }

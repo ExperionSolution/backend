@@ -1,16 +1,16 @@
 const ProductService = require('../services/products.service');
 const service = new ProductService();
-const { handleHttp, handleNotFound } = require('../utils/error.handler');
+const { handleHttp, handleNotFound, handleBadRequest } = require('../utils/error.handler');
 const { handleCreate, handleSuccess, handleNotContent } = require('../utils/success.handler');
 
 const create = async (req, res) => {
     try{
         const product = await service.create(req.body);
+        if(!product) return handleBadRequest(res, 'This product name already exist.')
         handleCreate(res, product);
     } catch(err){
         handleHttp(res, 'ERROR_CREATE_PRODUCT', err);
     }
-
 }
 
 const get = async (req, res) => {
@@ -26,7 +26,7 @@ const get = async (req, res) => {
 const getById = async (req, res) => {
     try{
         const product = await service.getById(req.params.id);
-        if(!product) return handleNotFound(res, 'ERROR_NOT_FOUND_PRODUCT');
+        if(!product) return handleNotFound(res, 'NOT_FOUND_PRODUCT');
         handleSuccess(res, product);
     } catch(err){
         handleHttp(res, 'ERROR_GET_ONE_PRODUCT', err);

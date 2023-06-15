@@ -21,17 +21,11 @@ class ProductService {
     }
 
     async create(data) {
-        const existingStorage = await this.model.findOne({
+        const existingProductName = await this.model.findOne({
           where: { name: data.name },
         });
     
-        if (existingStorage) {
-          throw new UniqueConstraintError({
-            message: 'This Storage Already exist.',
-            errors: [{ path: 'name', value: data.name }],
-            fields: ['name'],
-          });
-        }
+        if (existingProductName) return false;
     
         return await this.model.create(data);
       }

@@ -26,33 +26,39 @@ const ProductSchema = {
         allowNull: false,
         type: DataTypes.STRING,
         unique: true,
+        validate: {
+            len: [1, 30]
+        }
     },
    
     description:{
         allowNull: false,
         type: DataTypes.STRING,
+        validate: {
+            len: [1, 130]
+        }
     },
 
-    code :{
+    code:{
         allowNull: false,
         type: DataTypes.STRING,
         unique: true,
     },
 
-    price :{
+    price:{
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
     },
     quantity:{
         allowNull: true,
         type: DataTypes.INTEGER,
 
     },
-    discount :{
+    discount:{
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
     },
-    image :{
+    image:{
         allowNull: false,
         type: DataTypes.STRING,
     },
