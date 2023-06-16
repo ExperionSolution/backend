@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
     'DB',
 ]
 
@@ -63,6 +65,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'experion.wsgi.application'
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 #--------------- Passweord Validation-----------------------#
 AUTH_PASSWORD_VALIDATORS = [
@@ -110,6 +116,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #--------------------Users----------------------------------------#
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 AUTH_USER_MODEL = 'DB.Users'
 
 LOGIN_REDIRECT_URL = 'index'
@@ -133,17 +140,29 @@ db_from_env = dj_database_url.config(conn_max_age=500)
 
 
 
-ALLOWED_HOSTS = ['localhost']
+# ALLOWED_HOSTS = ['localhost']
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'user',
+#         'PASSWORD': 'admin',
+#         'HOST': 'local_pgdb',
+#         'PORT': 5432,
+#     }
+# }
+
+
+ALLOWED_HOSTS = []
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'user',
-        'PASSWORD': 'admin',
-        'HOST': 'local_pgdb',
+        'NAME': 'Experion-test',
+        'USER': 'postgres',
+        'PASSWORD': '210703920014Leo',
+        'HOST': 'localhost',
         'PORT': 5432,
     }
 }
-
-

@@ -1,15 +1,18 @@
 from django.shortcuts import redirect, render, HttpResponseRedirect
 
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetDoneView, PasswordResetView
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import default_token_generator
 
+
 from django.urls import reverse, reverse_lazy
+
+from django.http import JsonResponse
 
 from django.utils.text import capfirst
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -38,12 +41,28 @@ from .forms import *
 #--------------------LOGIN-------------------------#
 class LoginView(LoginView):
     template_name = 'login.html'        
+    authentication_form = AuthenticationForm
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('index')
         return super().dispatch(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            data = {'message':'Autenticacion exitosa', 'username':username}
+            print(data)
+            return JsonResponse(data, status=200)
+        else:
+            data = {'error':'Credenciales incorrectas'}
+            print(data)
+            return JsonResponse(data, status=401)
+ 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Inicio de sesion"
@@ -60,102 +79,7 @@ class SesionGroupView(View):
         return redirect('inicio')
     
 
-#--------------------USER CREATION-------------------------#
-class UserCreate(CreateView):
-    model = Users
-    form_class = UserCreateForm
-    template_name = 'register.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('index')
-        return super().dispatch(request, *args, **kwargs)
-    
-    def form_valid(self, form):
-        form.instance.first_name = capfirst(form.instance.first_name)
-        form.instance.last_name = capfirst(form.instance.last_name)
-        form.instance.is_active = False
-        usuario = form.save(commit=False)
-        usuario.save()
-        self.enviar_correo_activacion(usuario, self.request)
-
-        if form.errors:
-            self.object = None
-            errors = form.errors.get_json_data(escape_html=True)
-            for field, field_errors in errors.item():
-                form.add_error(field, ErrorList(field_errors))
-            return self.render_ro_response(self.get_context_data(form=form))
-        return super().form_valid(form)
-  
-    def get_success_url(self):
-        return reverse('login')
-
-    def enviar_correo_activacion(self, usuario, request):
-        current_site = get_current_site(request)
-        uid = urlsafe_base64_encode(force_bytes(usuario.id))
-        activate_url = reverse('user_activate', kwargs={'uidb64': uid, 'token': default_token_generator.make_token(usuario)})
-        activation_link = f"http://{current_site.domain}{activate_url}"        
-        subject = 'Activación de cuenta'
-        message = render_to_string('activate_account.html', {
-            'usuario': usuario,
-            'activation_link':activation_link,
-            'domain': current_site.domain,
-            'uid': urlsafe_base64_encode(force_bytes(usuario.id)),
-            'token': default_token_generator.make_token(usuario),
-        })
-        send_mail(subject, message, settings.EMAIL_HOST_USER, [usuario.email])
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Registro de usuario'
-
-        return context
-
-class UserActivate(TemplateView):
-    def get(self, request, uidb64, token, *args, **kwargs):
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            usuario = Users.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, Users.DoesNotExist):
-            usuario = None
-
-        if usuario is not None and default_token_generator.check_token(usuario, token):
-            usuario.is_active = True
-            usuario.save()
-            return redirect('login')
-        else:
-            print(uid, usuario)
-            return redirect('register')
-    
-
-#--------------------USER DATA EDIT-------------------------#
-class UserEdit(LoginRequiredMixin, UpdateView):
-    model = Users
-    form_class = UserEditForm
-    template_name = 'useredit.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()     
-        if self.object.username != request.user.username:
-            return redirect('index')    
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.first_name = capfirst(form.instance.first_name)
-        form.instance.last_name = capfirst(form.instance.last_name)
-        form.instance.address = capfirst(form.instance.address)
-        form.instance.country = capfirst(form.instance.country)
-        form.instance.city = capfirst(form.instance.city)
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('index')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Edicion de usuario'
-
-        return context
 
 class PasswordEdit(LoginRequiredMixin, FormView):
     model = Users
